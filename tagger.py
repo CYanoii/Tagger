@@ -6,8 +6,8 @@ import errors
 class Tagger():
     def __init__(self):
         self.projects_path = os.path.join('projects')
-        self.tags_path = os.path.join('tags')
-        self.tags_dict_path = os.path.join(self.tags_path, 'tags.json')
+        self.data_path = os.path.join('data')
+        self.tags_dict_path = os.path.join(self.data_path, 'tags.json')
         self.tags = tools.readJson(self.tags_dict_path)
     
     def projectImport(self, src_strpath):
@@ -34,7 +34,7 @@ class Tagger():
                         'uuid': project_uuid,
                         'tags': []
                         }
-        project_info_path = os.path.join(project_path, project_uuid + '.json')
+        project_info_path = os.path.join(self.data_path, project_uuid + '.json')
         tools.writeJson(project_info, project_info_path)
 
     def projectExport(self, uuid, dst_strpath):
@@ -212,7 +212,7 @@ class Tagger():
 
         project_info['tags'].append(tag_uuid)
 
-        project_info_path = os.path.join(self.projects_path, project_uuid, project_uuid + '.json')
+        project_info_path = os.path.join(self.data_path, project_uuid + '.json')
         tools.writeJson(project_info, project_info_path)
 
     def removeTag(self, project_uuid, tag_uuid):
@@ -246,7 +246,7 @@ class Tagger():
 
         project_info['tags'].reomve(tag_uuid)
 
-        project_info_path = os.path.join(self.projects_path, project_uuid, project_uuid + '.json')
+        project_info_path = os.path.join(self.data_path, project_uuid + '.json')
         tools.writeJson(project_info, project_info_path)
 
     def __getInfoByUuid(self, uuid):
@@ -257,7 +257,7 @@ class Tagger():
         处理异常
         UuidNotExistError: 项目uuid不存在
         """
-        path = os.path.join(self.projects_path, uuid, uuid + '.json')
+        path = os.path.join(self.data_path, uuid + '.json')
         try:
             info = tools.readJson(path)
         except errors.PathNotExistError as e:
