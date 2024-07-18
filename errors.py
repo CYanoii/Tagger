@@ -33,3 +33,39 @@ class DataTypeError(Exception):
     def __str__(self):
         # 当打印异常对象时，将调用此方法
         return f"{self.__class__.__name__}: {self.message}"
+
+class UuidNotExistError(Exception):  
+    def __init__(self, message="uuid不存在。"):
+        super().__init__(message) # 调用基类的构造器
+        self.message = message
+    
+    def __str__(self):
+        # 当打印异常对象时，将调用此方法
+        return f"{self.__class__.__name__}: {self.message}"
+
+class UuidAlreadyExistError(Exception):  
+    def __init__(self, message="uuid已存在。"):
+        super().__init__(message) # 调用基类的构造器
+        self.message = message
+    
+    def __str__(self):
+        # 当打印异常对象时，将调用此方法
+        return f"{self.__class__.__name__}: {self.message}"
+
+class NameAlreadyExistError(Exception):  
+    def __init__(self, message="名称已存在。"):
+        super().__init__(message) # 调用基类的构造器
+        self.message = message
+    
+    def __str__(self):
+        # 当打印异常对象时，将调用此方法
+        return f"{self.__class__.__name__}: {self.message}"
+
+class NameNotExistError(Exception):  
+    def __init__(self, message="名称不存在。"):
+        super().__init__(message) # 调用基类的构造器
+        self.message = message
+    
+    def __str__(self):
+        # 当打印异常对象时，将调用此方法
+        return f"{self.__class__.__name__}: {self.message}"

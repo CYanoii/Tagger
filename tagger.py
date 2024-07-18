@@ -1,6 +1,7 @@
 import os
 
 import tools
+import errors
 
 class Tagger():
     def __init__(self):
@@ -14,13 +15,15 @@ class Tagger():
         导入项目
         src_strpath: 字符串类型的资源路径（文件/文件夹均可）
 
-        异常情况:
-        导入资源路径不存在
+        处理异常
+        PathNotExistError: 导入资源路径不存在
         """
         src_path = os.path.join(src_strpath)
 
-        if tools.judgePathType(src_path) == 0:
-            print(f"[tagger] 所提供资源路径 '{src_strpath}' 不存在。")
+        try:
+            tools.judgePathType(src_path)
+        except errors.PathNotExistError as e:
+            print("[Tagger/projectImport] ", e)
             return
         
         project_uuid = tools.getNewUuid()
@@ -28,7 +31,7 @@ class Tagger():
         tools.copyFileOrDirectory(src_path, project_path)
 
         project_info = {'name': os.path.basename(src_path),
-                        'uuid': project_uuid, 
+                        'uuid': project_uuid,
                         'tags': []
                         }
         project_info_path = os.path.join(project_path, project_uuid + '.json')
@@ -40,28 +43,41 @@ class Tagger():
         uuid: 待导出项目的uuid
         dst_strpath: 字符串类型的目标路径（文件夹）
 
-        异常情况:
-        项目uuid不存在
-        目标路径不正确（不存在/非文件夹）
+        处理异常
+        PathNotExistError: 目标路径不存在
+        PathTypeError: 目标路径不是目录
+        UuidNotExistError: 项目uuid不存在
         """
         dst_path = os.path.join(dst_strpath)
 
-        if tools.judgePathType(dst_path) == 2:
-            info = self.getInfoByUuid(uuid)
-            project_path = os.path.join(self.projects_path, uuid, info['name'])
-            tools.copyFileOrDirectory(project_path, dst_path)
-        else:
-            print(f"[tagger] 所提供目标路径 '{dst_strpath}' 不正确。")
-            
+        try:
+            if tools.judgePathType(dst_path) != 2:
+                raise errors.PathTypeError(f"路径 '{dst_path}' 不是目录。")
+        except errors.PathNotExistError as e:
+            print("[Tagger/projectExport] ", e)
+            return
+        except errors.PathTypeError as e:
+            print("[Tagger/projectExport] ", e)
+            return
+
+        try:
+            info = self.__getInfoByUuid(uuid)
+        except errors.UuidNotExistError as e:
+            print("[Tagger/projectExport] ", e)
+            return
+
+        project_path = os.path.join(self.projects_path, uuid, info['name'])
+        tools.copyFileOrDirectory(project_path, dst_path)
+        
     def projectDelete(self, uuid):
         """
         删除项目
         uuid: 待删除项目的uuid
 
-        异常情况:
-        项目uuid不存在
+        处理异常
+        UuidNotExistError: 项目uuid不存在 未实现
         """
-        info = self.getInfoByUuid(uuid) # 没有考虑到不存在的情况
+        info = self.__getInfoByUuid(uuid) # 没有考虑到不存在的情况
         pass
 
     def showProjects(self, tags=[]):
@@ -69,58 +85,53 @@ class Tagger():
         根据所选标签展示数据
         tags: 所选标签uuid列表
 
-        异常情况:
-        
+        处理异常
+        UuidNotExistError: 项目uuid不存在
         """
         uuids = tools.getSubdirectoryNames(self.projects_path)
         for uuid in uuids:
-            info = self.getInfoByUuid(uuid)
+            try:
+                info = self.__getInfoByUuid(uuid)
+            except errors.UuidNotExistError as e:
+                print("[Tagger/showProjects] ", e)
+                return
 
             if set(tags).issubset(set(info['tags'])) :  # 先将有序列表转换成无序集合后再进行比较
                 formatted_name = info['name'].ljust(16)
                 formatted_uuid = info['uuid'].ljust(40)
                 formatted_tags = []
-                for tag in info['tags']:  
-                    if tag in self.tags:  # 确保键在映射字典中  
-                        formatted_tags.append(self.tags[tag])  
-                    else:  
-                        # 如果键不在映射字典中，你可以选择忽略它、添加默认值或抛出异常  
-                        # 这里我们添加一个默认值（例如None）  
-                        formatted_tags.append(None)
+                for tag in info['tags']:
+                    if tag in self.tags:  # 确保键在映射字典中
+                        formatted_tags.append(self.tags[tag])
+                    else:
+                        #!!!!
+                        # 如果键不在映射字典中，说明这是一个被删除的标签。既然存在，则本项目需要被整理
+                        formatted_tags.append("已删除标签") # 添加一个默认值
+                        # self.__OrganizeProjectTags()
                 print(f'{formatted_name} {formatted_uuid} {formatted_tags}')
 
     def showTags(self):
         """
         展示所有标签
 
-        异常情况:
+        处理异常
         
         """
         pass
-
-    def getInfoByUuid(self, uuid):
-        """
-        通过uuid查询信息
-        uuid: 待查询信息的项目的uuid
-
-        异常情况:
-        项目uuid不存在
-        """
-        # 没有考虑到不存在的情况
-        path = os.path.join(self.projects_path, uuid, uuid + '.json')
-        info = tools.readJson(path)
-        return info
     
     def createTag(self, tag_name):
         """
         创建一个标签
         tag_name: 待创建标签的名字
 
-        异常情况:
-        标签名已存在
+        处理异常
+        NameAlreadyExistError: 标签名已存在
         """
-        if any(tag_name == value for value in self.tags.values()):
-            print(f"[tagger] 已经存在名为 '{tag_name}' 的标签了。")
+        try:
+            if any(tag_name == value for value in self.tags.values()):
+                raise errors.NameAlreadyExistError(f"已经存在名为 '{tag_name}' 的标签了。")
+        except errors.NameAlreadyExistError as e:
+            print("[tagger/createTag] ", e)
             return
         
         tag_uuid = tools.getNewUuid()
@@ -132,9 +143,16 @@ class Tagger():
         删除一个标签
         uuid: 待删除标签的uuid
 
-        异常情况:
-        标签uuid不存在
+        处理异常
+        UuidNotExistError: 标签uuid不存在
         """
+        try:
+            if uuid not in self.tags:
+                raise errors.UuidNotExistError(f"标签uuid '{uuid}' 不存在。")
+        except errors.UuidNotExistError as e:
+            print("[tagger/deleteTag] ", e)
+            return
+
         self.tags.pop(uuid)
         tools.writeJson(self.tags, self.tags_dict_path)
 
@@ -143,12 +161,21 @@ class Tagger():
         重命名一个标签
         uuid: 待重命名标签的uuid
 
-        异常情况:
-        标签uuid不存在
-        重命名标签名已存在
+        处理异常
+        UuidNotExistError: 标签uuid不存在
+        NameAlreadyExistError: 重命名标签名已存在
         """
-        if any(tag_name == value for value in self.tags.values()):
-            print(f"[tagger] 已经存在名为 '{tag_name}' 的标签了。")
+        try:
+            if uuid not in self.tags:
+                raise errors.UuidNotExistError(f"标签uuid '{uuid}' 不存在。")
+        except errors.UuidNotExistError as e:
+            print("[tagger/renameTag] ", e)
+            return
+        try:
+            if any(tag_name == value for value in self.tags.values()):
+                raise errors.NameAlreadyExistError(f"已经存在名为 '{tag_name}' 的标签了。")
+        except errors.NameAlreadyExistError as e:
+            print("[tagger/renameTag] ", e)
             return
 
         self.tags[uuid] = tag_name
@@ -158,12 +185,31 @@ class Tagger():
         """
         为一个项目添加一个标签
 
-        异常情况:
-        项目uuid不存在
-        标签uuid不存在
-        项目已有本标签
+        处理异常
+        UuidNotExistError: 项目uuid不存在
+        UuidNotExistError: 标签uuid不存在
+        NameAlreadyExistError: 项目已有本标签
         """
-        project_info = self.getInfoByUuid(project_uuid)
+        try:
+            project_info = self.__getInfoByUuid(project_uuid)
+        except errors.UuidNotExistError as e:
+            print("[tagger/addTag] ", e)
+            return
+
+        try:
+            if tag_uuid not in self.tags:
+                raise errors.UuidNotExistError(f"标签uuid '{tag_uuid}' 不存在。")
+        except errors.UuidNotExistError as e:
+            print("[tagger/addTag] ", e)
+            return
+
+        try:
+            if any(tag_uuid == uuid for uuid in project_info['tags']):
+                raise errors.NameAlreadyExistError(f"'{project_uuid}' 项目已经存在uuid为 '{tag_uuid}' 的标签了。")
+        except errors.NameAlreadyExistError as e:
+            print("[tagger/addTag] ", e)
+            return
+
         project_info['tags'].append(tag_uuid)
 
         project_info_path = os.path.join(self.projects_path, project_uuid, project_uuid + '.json')
@@ -173,13 +219,50 @@ class Tagger():
         """
         为一个项目移除一个标签
 
-        异常情况:
-        项目uuid不存在
-        标签uuid不存在
-        项目未拥有本标签
+        处理异常
+        UuidNotExistError: 项目uuid不存在
+        UuidNotExistError: 标签uuid不存在
+        NameNotExistError: 项目未拥有本标签
         """
-        project_info = self.getInfoByUuid(project_uuid)
+        try:
+            project_info = self.__getInfoByUuid(project_uuid)
+        except errors.UuidNotExistError as e:
+            print("[tagger/removeTag] ", e)
+            return
+
+        try:
+            if tag_uuid not in self.tags:
+                raise errors.UuidNotExistError(f"标签uuid '{tag_uuid}' 不存在。")
+        except errors.UuidNotExistError as e:
+            print("[tagger/removeTag] ", e)
+            return
+        
+        try:
+            if not any(tag_uuid == uuid for uuid in project_info['tags']):
+                raise errors.NameNotExistError(f"'{project_uuid}' 项目不存在uuid为 '{tag_uuid}' 的标签。")
+        except errors.NameNotExistError as e:
+            print("[tagger/removeTag] ", e)
+            return
+
         project_info['tags'].reomve(tag_uuid)
 
         project_info_path = os.path.join(self.projects_path, project_uuid, project_uuid + '.json')
         tools.writeJson(project_info, project_info_path)
+
+    def __getInfoByUuid(self, uuid):
+        """
+        通过uuid查询信息
+        uuid: 待查询信息的项目的uuid
+
+        处理异常
+        UuidNotExistError: 项目uuid不存在
+        """
+        path = os.path.join(self.projects_path, uuid, uuid + '.json')
+        try:
+            info = tools.readJson(path)
+        except errors.PathNotExistError as e:
+            raise errors.UuidNotExistError(f"项目uuid '{uuid}' 不存在。") from e
+        except errors.PathTypeError as e:
+            raise errors.UuidNotExistError(f"项目uuid '{uuid}' 不存在。") from e
+
+        return info
