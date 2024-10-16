@@ -10,7 +10,7 @@ class Tagger():
         self.tags_dict_path = os.path.join(self.data_path, 'tags.json')
         self.tags = tools.readJson(self.tags_dict_path)
     
-    def projectImport(self, src_strpath):
+    def importProject(self, src_strpath):
         """
         导入项目
         src_strpath: 字符串类型的资源路径（文件/文件夹均可）
@@ -37,7 +37,7 @@ class Tagger():
         project_info_path = os.path.join(self.data_path, project_uuid + '.json')
         tools.writeJson(project_info, project_info_path)
 
-    def projectExport(self, uuid, dst_strpath):
+    def exportProject(self, uuid, dst_strpath):
         """
         导出项目
         uuid: 待导出项目的uuid
@@ -69,7 +69,7 @@ class Tagger():
         project_path = os.path.join(self.projects_path, uuid, info['name'])
         tools.copyFileOrDirectory(project_path, dst_path)
         
-    def projectDelete(self, uuid):
+    def deleteProject(self, uuid):
         """
         删除项目
         uuid: 待删除项目的uuid
@@ -109,15 +109,6 @@ class Tagger():
                         formatted_tags.append("已删除标签") # 添加一个默认值
                         # self.__OrganizeProjectTags()
                 print(f'{formatted_name} {formatted_uuid} {formatted_tags}')
-
-    def showTags(self):
-        """
-        展示所有标签
-
-        处理异常
-        
-        """
-        pass
     
     def createTag(self, tag_name):
         """
@@ -248,6 +239,16 @@ class Tagger():
 
         project_info_path = os.path.join(self.data_path, project_uuid + '.json')
         tools.writeJson(project_info, project_info_path)
+
+    def showTags(self):
+        """
+        展示所有标签
+
+        处理异常
+        无
+        """
+        for key, value in self.tags.items():
+            print(key, value)
 
     def __getInfoByUuid(self, uuid):
         """
