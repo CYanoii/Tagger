@@ -27,12 +27,16 @@ def draw(data):
         for i in range(item_len):
             item_max[i] = max(item_max[i], chinese_len(item[i]))
 
+    print(item_max)
+
     for item in data:
         for i in range(item_len):
-                if len(item[i]) == chinese_len(item[i]):    # 没有中文字符
+                le = len(item[i])
+                cle = chinese_len(item[i])
+                if le == cle:    # 没有中文字符
                     item[i] = item[i].center(item_max[i] + 2)
                 else:                                       # 有中文字符
-                    item[i] = item[i].center(item_max[i] + 2 - len(item[i]))
+                    item[i] = item[i].center(item_max[i] + 2 - (cle - le))
 
     # 绘制数据之间的表格行
     str_line = '+'
@@ -62,7 +66,7 @@ if __name__ == '__main__':
     # draw(data)
 
     table = tagger.getProjectsTableByTags(["a96a87c8-3606-4a39-9684-81a0e2d8954e"])
-    print(table)
+    # print(table)
     draw(table)
 
     # while(1):
