@@ -3,8 +3,10 @@ import copy
 from tagger import Tagger
 
 # 在传值被修改了的事情上有问题
-def draw(data):
+def draw(data, header = [], add_id = False):
     # 用于将数据绘制好看。输入是严格的长度相等的二维list
+    # header: 表头
+    # add_id: 添加序号
     
     def chinese_len(s):
         # 默认的len()会将中文字符长度视为1，但我们希望将其长度视为2
@@ -18,7 +20,24 @@ def draw(data):
                 length += 1
         return length
 
+
     data = copy.deepcopy(data)
+    item_len = len(data[0])
+
+    header_len = len(header)
+    if header_len != 0:
+        if header_len > item_len:
+            header = header[:item_len]
+        elif header_len < item_len:
+            header = header + [''] * (item_len - header_len)
+        data.insert(0, header)
+    
+    if add_id == True:
+        if len(header) != 0: id = -1
+        else: id = 0
+        for item in data:
+            id += 1
+            item.insert(0, str(id))
 
     item_len = len(data[0])
 
@@ -26,8 +45,6 @@ def draw(data):
     for item in data:
         for i in range(item_len):
             item_max[i] = max(item_max[i], chinese_len(item[i]))
-
-    print(item_max)
 
     for item in data:
         for i in range(item_len):
@@ -67,7 +84,7 @@ if __name__ == '__main__':
 
     table = tagger.getProjectsTableByTags(["a96a87c8-3606-4a39-9684-81a0e2d8954e"])
     # print(table)
-    draw(table)
+    draw(table, header=['名称', 'Uuid', '标签'], add_id=True)
 
     # while(1):
     #     inp = input()
