@@ -249,17 +249,20 @@ class Tagger():
         
         return table
 
-    def getTagNamesTable(self):
+    def getAllTagsTable(self):
         """
-        获取所有标签名表格
+        获取所有标签数据表格
 
-        return: 一维list，列为标签名
+        return: 二维list，行为标签，列为属性
 
         处理异常
         无
         """
-        for _, value in self.tags.items():
-            print(value)
+        tags = []
+        for key, value in self.tags.items():
+            tags.append([value, key])
+        
+        return tags
 
     # ==========内部函数==========
 

@@ -83,8 +83,10 @@ if __name__ == '__main__':
     # draw(data)
 
     table = tagger.getProjectsTableByTags(["a96a87c8-3606-4a39-9684-81a0e2d8954e"])
-    # print(table)
-    draw(table, header=['名称', 'Uuid', '标签'], add_id=True)
+    draw(table, header=['项目名称', 'Uuid', '标签'], add_id=True)
+
+    table = tagger.getAllTagsTable()
+    draw(table, header=['标签名称', 'Uuid'], add_id=True)
 
     # while(1):
     #     inp = input()
