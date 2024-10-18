@@ -212,14 +212,18 @@ class Tagger():
 
     # ==========展示函数==========
 
-    def showProjectsByTags(self, tags=[]):
+    def getProjectsTableByTags(self, tags=[]):
         """
-        展示包含所选标签uuid标签集的项目数据
+        获取包含所选标签uuid标签集的项目数据表格
         tags: 所选标签uuid列表
+
+        return: 二维list，行为项目，列为属性
 
         处理异常
         UuidNotExistError: 项目uuid不存在
         """
+
+        table = []
         uuids = tools.getSubdirectoryNames(self.projects_path)
         for uuid in uuids:
             try:
@@ -228,23 +232,28 @@ class Tagger():
                 print("[Tagger/showProjects] ", e)
                 return
 
+            project = []
             if set(tags).issubset(set(info['tags'])) :  # 先将有序列表转换成无序集合后再进行比较
-                formatted_name = info['name'].ljust(16)
-                formatted_uuid = info['uuid'].ljust(40)
-                formatted_tags = []
+                project.append(info['name'])
+                project.append(info['uuid'])
+                ptags = []
                 for tag in info['tags']:
                     if tag in self.tags:  # 确保键在映射字典中
-                        formatted_tags.append(self.tags[tag])
+                        ptags.append(self.tags[tag])
                     else:
                         #!!!!
                         # 如果键不在映射字典中，说明这是一个被删除的标签。既然存在，则本项目需要被整理
-                        formatted_tags.append("已删除标签") # 添加一个默认值
-                        # self.__OrganizeProjectTags()
-                print(f'{formatted_name} {formatted_uuid} {formatted_tags}')
+                        pass
+                project.append(' '.join(ptags))
+                table.append(project)
+        
+        return table
 
-    def showTagNames(self):
+    def getTagNamesTable(self):
         """
-        展示所有标签名
+        获取所有标签名表格
+
+        return: 一维list，列为标签名
 
         处理异常
         无

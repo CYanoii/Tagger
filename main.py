@@ -57,12 +57,13 @@ if __name__ == '__main__':
     # tagger.projectImport('testdata/123.txt')
     # tagger.projectImport('testdata/456.txt')
     # tagger.projectImport('testdata')
-    
-    data = [['我的世界', '22', '3'],['44', '555555', '6']]
-    draw(data)
-    print(data)
 
-    # tagger.showProjectsByTags(["a96a87c8-3606-4a39-9684-81a0e2d8954e"])
+    # data = [['我的世界', '22', '3'],['44', '555555', '6']]
+    # draw(data)
+
+    table = tagger.getProjectsTableByTags(["a96a87c8-3606-4a39-9684-81a0e2d8954e"])
+    print(table)
+    draw(table)
 
     # while(1):
     #     inp = input()
