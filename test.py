@@ -28,11 +28,30 @@
   
 # main()
 
-dic = {}
-dic[1]='123'
-dic[2]='234'
+# dic = {}
+# dic[1]='123'
+# dic[2]='234'
 
-if 1 not in dic:
-    print(1)
-if 3 not in dic:
-    print(3)
+# if 1 not in dic:
+#     print(1)
+# if 3 not in dic:
+#     print(3)
+
+# def change(n):
+#     print(id(n))
+#     n = 1000
+#     print(id(n))
+
+# x = 3
+# print(id(x))
+# change(x)
+# print(x)
+
+def change(n):
+    print(id(n))
+    n.append(4)
+
+x = [1, 2, 3]
+print(id(x))
+change(x)
+print(x)
