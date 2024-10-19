@@ -82,11 +82,13 @@ if __name__ == '__main__':
     # data = [['我的世界', '22', '3'],['44', '555555', '6']]
     # draw(data)
 
-    table = tagger.getProjectsTableByTags(["a96a87c8-3606-4a39-9684-81a0e2d8954e"])
-    draw(table, header=['项目名称', 'Uuid', '标签'], add_id=True)
+    # table = tagger.getProjectsTableByTags(["a96a87c8-3606-4a39-9684-81a0e2d8954e"])
+    # draw(table, header=['项目名称', 'Uuid', '标签'], add_id=True)
 
-    table = tagger.getAllTagsTable()
-    draw(table, header=['标签名称', 'Uuid'], add_id=True)
+    # table = tagger.getAllTagsTable()
+    # draw(table, header=['标签名称', 'Uuid'], add_id=True)
+
+    # print(tagger.getUuidByTagName('我的世界'))
 
     # while(1):
     #     inp = input()

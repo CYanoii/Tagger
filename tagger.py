@@ -210,6 +210,25 @@ class Tagger():
         project_info_path = os.path.join(self.data_path, project_uuid + '.json')
         tools.writeJson(project_info, project_info_path)
 
+    def getUuidByTagName(self, TagName):
+        """
+        通过标签名获取其标签uuid
+        TagName: 待获取标签uuid的的标签名
+
+        处理异常
+        NameNotExistError: 标签名不存在
+        """
+
+        for key, value in self.tags.items():
+            if value == TagName:
+                return key
+        
+        try:
+            raise errors.NameNotExistError(f"标签名 '{TagName}' 不存在。")
+        except errors.NameNotExistError as e:
+            print("[tagger/getUuidByTagName] ", e)
+            return
+
     # ==========展示函数==========
 
     def getProjectsTableByTags(self, tags=[]):
@@ -271,7 +290,7 @@ class Tagger():
         通过uuid查询信息
         uuid: 待查询信息的项目的uuid
 
-        处理异常
+        传出异常
         UuidNotExistError: 项目uuid不存在
         """
         path = os.path.join(self.data_path, uuid + '.json')
@@ -284,22 +303,12 @@ class Tagger():
 
         return info
 
-    def __getUuidByTagName(self, TagName):
-        """
-        通过标签名获取其标签uuid
-        TagName: 待获取标签uuid的的标签名
-
-        处理异常
-        待定
-        """
-        pass
-
     def __organizeProjectTags(self, uuid):
         """
         整理uuid项目的标签集信息
         uuid: 待整理标签集的项目的uuid
 
-        处理异常
+        传出异常
         待定
         """
         pass
