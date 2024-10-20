@@ -80,6 +80,24 @@ class Tagger():
         info = self.__getInfoByUuid(uuid) # 没有考虑到不存在的情况
         pass
     
+    def openProject(self, uuid):
+        """
+        打开项目(考虑打开的同时整理项目、添加打开方式属性)
+        uuid: 待打开项目的uuid
+
+        处理异常
+        UuidNotExistError: 项目uuid不存在
+        """
+        try:
+            info = self.__getInfoByUuid(uuid)
+        except errors.UuidNotExistError as e:
+            print("[Tagger/openProject] ", e)
+            return
+        
+        path = os.path.join(self.projects_path, uuid, info['name'])
+        tools.openFileOrDirectory(path)
+
+
     def createTag(self, tag_name):
         """
         创建一个标签
@@ -305,8 +323,8 @@ class Tagger():
 
     def __organizeProjectTags(self, uuid):
         """
-        整理uuid项目的标签集信息
-        uuid: 待整理标签集的项目的uuid
+        将还在该项目数据中的已被删除标签的标签uuid删除
+        uuid: 待处理项目的uuid
 
         传出异常
         待定

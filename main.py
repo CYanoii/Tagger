@@ -90,6 +90,9 @@ if __name__ == '__main__':
 
     # print(tagger.getUuidByTagName('我的世界'))
 
+    tagger.openProject('32538231-5445-4368-8aed-33492cdabc7e')
+    tagger.openProject('efd639b4-637a-4bc0-9904-82cc2ae45ed0')
+
     # while(1):
     #     inp = input()
     #     op = inp.split(" ")

@@ -177,6 +177,20 @@ def getSubdirectoryNames(path):
             subfolder_names.append(item)
     return subfolder_names
 
+def openFileOrDirectory(path):
+    """
+    功能
+    打开文件或目录(目前可能仅适用于Windows系统)
+
+    传出异常
+    PathNotExistError: 路径不存在
+    """
+    if not os.path.exists(path):
+        raise errors.PathNotExistError(f"路径 '{path}' 不存在。")
+    
+    os.startfile(path)
+
+
 if __name__ == '__main__':
     # try:
     #     createDirectory("abcd", "efgh")
@@ -186,13 +200,18 @@ if __name__ == '__main__':
     #     print(f'tools.py: {e}')
 
     # json_data = {1:'123'}
-    # json_path = os.path.join('./jsontest.json')
+    # json_path = os.path.join('jsontest.json')
     # writeJson(json_data, json_path)
 
-    # json_path = os.path.join('./jsontest.json')
+    # json_path = os.path.join('jsontest.json')
     # data = readJson(json_path)
     # print(data)
 
-    path = os.path.join('./projects')
-    data = getSubdirectoryNames(path)
-    print(data)
+    # path = os.path.join('projects')
+    # data = getSubdirectoryNames(path)
+    # print(data)
+
+    path = os.path.join('projects', '32538231-5445-4368-8aed-33492cdabc7e', '456.txt')
+    openFileOrDirectory(path)
+    path = os.path.join('projects')
+    openFileOrDirectory(path)
