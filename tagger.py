@@ -82,15 +82,20 @@ class Tagger():
     
     def openProject(self, uuid):
         """
-        打开项目(考虑打开的同时整理项目、添加打开方式属性)
+        整理并打开项目(考虑添加打开方式属性)
         uuid: 待打开项目的uuid
 
         处理异常
         UuidNotExistError: 项目uuid不存在
+        DataTypeError: 覆写Json的数据类型不是字典
         """
         try:
-            info = self.__getInfoByUuid(uuid)
+            info = self.__organizeProjectTags(uuid) # 整理项目
+            # info = self.__getInfoByUuid(uuid)     # 不整理项目
         except errors.UuidNotExistError as e:
+            print("[Tagger/openProject] ", e)
+            return
+        except errors.DataTypeError as e:
             print("[Tagger/openProject] ", e)
             return
         
@@ -308,6 +313,8 @@ class Tagger():
         通过uuid查询信息
         uuid: 待查询信息的项目的uuid
 
+        return: 项目信息dict
+
         传出异常
         UuidNotExistError: 项目uuid不存在
         """
@@ -326,7 +333,24 @@ class Tagger():
         将还在该项目数据中的已被删除标签的标签uuid删除
         uuid: 待处理项目的uuid
 
+        return: 项目信息dict
+
         传出异常
-        待定
+        UuidNotExistError: 项目uuid不存在
+        DataTypeError: 覆写Json的数据类型不是字典
         """
-        pass
+        try:
+            info = self.__getInfoByUuid(uuid)
+        except errors.UuidNotExistError as e:
+            raise errors.UuidNotExistError(f"项目uuid '{uuid}' 不存在。") from e
+
+        filtered_tags = [tag for tag in info['tags'] if tag in self.tags]
+        
+        if len(filtered_tags) != len(info['tags']):
+            info['tags'] = filtered_tags
+            try:
+                tools.writeJson(info, os.path.join(self.data_path, uuid + '.json'))
+            except errors.DataTypeError as e:
+                raise errors.DataTypeError("数据类型错误，不是字典类型。") from e
+        
+        return info
