@@ -23,7 +23,7 @@ class Tagger():
         try:
             tools.judgePathType(src_path)
         except errors.PathNotExistError as e:
-            print("[Tagger/projectImport] ", e)
+            print("[Tagger/importProject] ", e)
             return
         
         project_uuid = tools.getNewUuid()
@@ -54,16 +54,16 @@ class Tagger():
             if tools.judgePathType(dst_path) != 2:
                 raise errors.PathTypeError(f"路径 '{dst_path}' 不是目录。")
         except errors.PathNotExistError as e:
-            print("[Tagger/projectExport] ", e)
+            print("[Tagger/exportProject] ", e)
             return
         except errors.PathTypeError as e:
-            print("[Tagger/projectExport] ", e)
+            print("[Tagger/exportProject] ", e)
             return
 
         try:
             info = self.__getInfoByUuid(uuid)
         except errors.UuidNotExistError as e:
-            print("[Tagger/projectExport] ", e)
+            print("[Tagger/exportProject] ", e)
             return
 
         project_path = os.path.join(self.projects_path, uuid, info['name'])
@@ -266,7 +266,7 @@ class Tagger():
             try:
                 info = self.__getInfoByUuid(uuid)
             except errors.UuidNotExistError as e:
-                print("[Tagger/showProjects] ", e)
+                print("[Tagger/getProjectsTableByTags] ", e)
                 return
 
             project = []
