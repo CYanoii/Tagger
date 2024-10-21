@@ -108,6 +108,27 @@ def copyFileOrDirectory(src, dst):
         shutil.copytree(src, full_path)
         print(f"Directory resource '{src}' copied to '{dst}'.")
 
+def deleteFileOrDirectory(path):
+    """
+    功能
+    删除路径所指的文件或目录
+
+    返回值
+    无
+
+    传出异常
+    PathNotExistError: 路径不存在
+    """
+    try:
+        path_type = judgePathType(path)
+    except errors.PathNotExistError as e:
+        raise errors.PathNotExistError(f"路径 '{path}' 不存在。")
+    
+    if path_type == 1:
+        os.remove(path)
+    else:
+        shutil.rmtree(path)
+
 def writeJson(data, path):
     """
     功能
@@ -211,7 +232,13 @@ if __name__ == '__main__':
     # data = getSubdirectoryNames(path)
     # print(data)
 
-    path = os.path.join('projects', '32538231-5445-4368-8aed-33492cdabc7e', '456.txt')
-    openFileOrDirectory(path)
-    path = os.path.join('projects')
-    openFileOrDirectory(path)
+    # path = os.path.join('projects', '32538231-5445-4368-8aed-33492cdabc7e', '456.txt')
+    # openFileOrDirectory(path)
+    # path = os.path.join('projects')
+    # openFileOrDirectory(path)
+
+    # path = os.path.join('123.txt')
+    # deleteFileOrDirectory(path)
+    # path = os.path.join('123')
+    # deleteFileOrDirectory(path)
+    pass

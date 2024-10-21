@@ -71,14 +71,27 @@ class Tagger():
         
     def deleteProject(self, uuid):
         """
-        删除项目
+        删除项目(考虑实现回收站功能)
         uuid: 待删除项目的uuid
 
         处理异常
-        UuidNotExistError: 项目uuid不存在 未实现
+        UuidNotExistError: 项目uuid不存在
+        PathNotExistError: 项目数据不存在
         """
-        info = self.__getInfoByUuid(uuid) # 没有考虑到不存在的情况
-        pass
+        try:
+            info = self.__getInfoByUuid(uuid)
+        except errors.UuidNotExistError as e:
+            print("[Tagger/deleteProject] ", e)
+            return
+        
+        project_data_path = os.path.join(self.data_path, uuid + '.json')
+        project_path = os.path.join(self.projects_path, uuid)
+        try:
+            tools.deleteFileOrDirectory(project_data_path)
+            tools.deleteFileOrDirectory(project_path)
+        except errors.PathNotExistError as e:
+            print("[Tagger/deleteProject] ", e)
+            return
     
     def openProject(self, uuid):
         """
